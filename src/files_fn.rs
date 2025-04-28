@@ -1,8 +1,9 @@
-use csv::ReaderBuilder;
+use csv::{Error, ReaderBuilder};
 use std::fs;
+use std::io::{self, Write};
 use serde_json::Value;
 
-pub fn read_json_as_vec(path: &String) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
+fn read_json_as_vec(path: &String) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
     let contenido = fs::read_to_string(path)?;
     let json: Value = serde_json::from_str(&contenido)?;
 
@@ -21,8 +22,30 @@ pub fn read_json_as_vec(path: &String) -> Result<Vec<Vec<String>>, Box<dyn std::
 
     Ok(table)
 }
+pub fn open_json(table: &mut Vec<Vec<String>>){
+    let mut path = String::new();
+    print!("Please, insert the JSON file path:");
+    io::stdout().flush().unwrap();
+    io::stdin().read_line( &mut path).expect("Error! The path wasn't correct");
+    path = path.trim().to_string();
+    println!("{:?}", path);
+    match read_json_as_vec(&path) {
+        Ok(value) => {
+            println!("SUCCESS! - LOAD JSON FILE");
+            table.clear();
+            table.extend(value);
+        },
+        Err(_) => println!("FAILED! - LOAD JSON FILE"),                
+    };
+}
+pub fn test_call_json(path: &String) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>>{
+    match read_json_as_vec(path) {
+        Ok(value) => Ok(value),
+        Err(e) => Err(e)
+    }
+}
 
-pub fn read_csv_file_as_vec(path: &String) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
+fn read_csv_file_as_vec(path: &String) -> Result<Vec<Vec<String>>, Box<dyn std::error::Error>> {
     let mut file_readed = ReaderBuilder::new()
     .has_headers(false)
     .from_path(path)?;
@@ -35,4 +58,20 @@ pub fn read_csv_file_as_vec(path: &String) -> Result<Vec<Vec<String>>, Box<dyn s
     }
 
     Ok(result)
+}
+pub fn open_csv(table: &mut Vec<Vec<String>>) {
+    let mut path = String::new();
+    print!("Please, insert the CSV file path:");
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut path).expect("Error! The path wasn't correct");
+    path = path.trim().to_string();
+    println!("{:?}", path);
+    match read_csv_file_as_vec(&path) {
+        Ok(value) => {
+            println!("SUCCESS! - CSV FILE is loaded");
+            table.clear();
+            table.extend(value);
+        },
+        Err(_) => println!("FAILED! - LOAD CSV FILE"),                
+    };
 }

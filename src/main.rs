@@ -140,8 +140,7 @@ fn main() {
 fn files_menu(table: &mut Vec<Vec<String>>){
     clear_screen();
     let mut option = String::new();
-    let mut path = String::new();
-
+    
     println!("\n----- Menu -----");
     println!("1. Load JSON");
     println!("2. Load CSV");
@@ -156,36 +155,12 @@ fn files_menu(table: &mut Vec<Vec<String>>){
     match option {
         1 => {
             println!("Loading JSON");
-            print!("Please, insert the JSON file path:");
-            io::stdout().flush().unwrap();
-            io::stdin().read_line(&mut path).expect("Error! The path wasn't correct");
-            path = path.trim().to_string();
-            println!("{:?}", path);
-            match files_fn::read_json_as_vec(&path) {
-                Ok(value) => {
-                    println!("SUCCESS! - LOAD JSON FILE");
-                    table.clear();
-                    table.extend(value);
-                },
-                Err(_) => println!("FAILED! - LOAD JSON FILE"),                
-            };
+            files_fn::open_json(table);
         },
         2 => {
             println!("Loading CSV");
-            print!("Please, insert the CSV file path:");
-            io::stdout().flush().unwrap();
-            io::stdin().read_line(&mut path).expect("Error! The path wasn't correct");
-            path = path.trim().to_string();
-            println!("{:?}", path);
-            match files_fn::read_csv_file_as_vec(&path) {
-                Ok(value) => {
-                    println!("SUCCESS! - CSV FILE is loaded");
-                    table.clear();
-                    table.extend(value);
-                },
-                Err(_) => println!("FAILED! - LOAD CSV FILE"),                
-            };
-        }
+            files_fn::open_csv(table);
+        },
         3 => println!("Leaving from files menu."),
         _ => println!("Invalid option!"),
     }
